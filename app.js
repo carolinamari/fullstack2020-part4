@@ -1,5 +1,7 @@
 const config = require('./utils/config')
 const express = require('express')
+/*eslint-env es6*/
+
 const app = express()
 const cors = require('cors')
 const blogsRouter = require('./controllers/blogs')

@@ -1,3 +1,5 @@
+/*eslint-env es6*/
+
 const mongoose = require('mongoose')
 
 const blogSchema = new mongoose.Schema({

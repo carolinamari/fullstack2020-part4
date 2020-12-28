@@ -1,3 +1,5 @@
+/*eslint-env es6*/
+
 require('dotenv').config()
 
 const PORT = process.env.PORT

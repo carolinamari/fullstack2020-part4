@@ -1,3 +1,5 @@
+/*eslint-env es6*/
+
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 

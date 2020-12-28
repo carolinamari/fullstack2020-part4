@@ -1,3 +1,5 @@
+/*eslint-env es6*/
+
 const logger = require('./logger')
 
 const requestLogger = (request, response, next) => {
