@@ -98,6 +98,23 @@ describe('POST requests to /api/blogs', () => {
     })
 })
 
+describe('DELETE requests', () => {
+
+    test('Delete existing blog', async () => {
+        let response = await api.get('/api/blogs')
+        const blogToDelete = response.body[0]
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        response = await api.get('/api/blogs')
+        const urls = response.body.map(blog => blog.url)
+        expect(response.body).toHaveLength(helper.initBlogs.length - 1)
+        expect(urls).not.toContain(blogToDelete.url)
+    })
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
