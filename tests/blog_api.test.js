@@ -15,9 +15,17 @@ describe('GET requests to /api/blogs', () => {
             .expect('Content-Type', /application\/json/)
     })
 
-    test('There are 4 notes', async () => {
+    test('There are 5 notes', async () => {
         const response = await api.get('/api/blogs')
-        expect(response.body).toHaveLength(4)
+        expect(response.body).toHaveLength(5)
+    })
+})
+
+test('Verify existence of id property', async () => {
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+    blogs.forEach(blog => {
+        expect(blog.id).toBeDefined()
     })
 })
 
