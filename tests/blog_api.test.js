@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const _ = require('lodash')
 
 const api = supertest(app)
 
@@ -60,6 +61,25 @@ describe('POST requests to /api/blogs', () => {
 
         expect(response.body).toHaveLength(helper.initBlogs.length + 1)
         expect(urls).toContain('www.newblog.com')
+    })
+
+    test('Add new blog with likes property missing', async () => {
+        const newBlog = {
+            title: 'New blog 2',
+            author: 'New author 2',
+            url: 'www.newblog2.com'
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+        
+        const response = await api.get('/api/blogs')
+        const i = _.findIndex(response.body, (blog) => blog.url === newBlog.url)
+
+        expect(response.body[i].likes).toBe(0)
     })
 })
 
