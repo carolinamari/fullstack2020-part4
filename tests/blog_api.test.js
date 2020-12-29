@@ -115,6 +115,49 @@ describe('DELETE requests', () => {
     })
 })
 
+describe('UPDATE requests', () => {
+
+    test('Update likes of an existing blog', async () => {
+        let response = await api.get('/api/blogs')
+        const blogToUpdate = response.body[0]
+        const newLikes = 34
+        const updatedBlog = {
+            title: blogToUpdate.title,
+            author: blogToUpdate.author,
+            url: blogToUpdate.url,
+            likes: newLikes
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlog)
+            .expect(200)
+        
+        response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initBlogs.length)
+        expect(response.body[0].likes).toBe(newLikes)
+    })
+
+    test('Fails for update of existing blogs with missing title and url', async () => {
+        let response = await api.get('/api/blogs')
+        const blogToUpdate = response.body[0]
+        const newLikes = 34
+        const updatedBlog = {
+            author: blogToUpdate.author,
+            likes: newLikes
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlog)
+            .expect(400)
+        
+        response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initBlogs.length)
+        expect(response.body[0]).toEqual(blogToUpdate)
+    })
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
