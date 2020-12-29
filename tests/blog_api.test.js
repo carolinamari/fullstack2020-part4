@@ -81,6 +81,21 @@ describe('POST requests to /api/blogs', () => {
 
         expect(response.body[i].likes).toBe(0)
     })
+
+    test('Blog without title and url is not added', async () => {
+        const newBlog = {
+            author: 'New author 3',
+            likes: 50
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        const response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initBlogs.length)
+    })
 })
 
 

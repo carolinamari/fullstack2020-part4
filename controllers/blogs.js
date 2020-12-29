@@ -10,12 +10,10 @@ blogsRouter.get('/', async (request, response) => {
   
 blogsRouter.post('/', async (request, response) => {
     const blog = new Blog(request.body)
-    console.log(blog);
     
     if (!blog.likes) {
         blog.likes = 0
     }
-    console.log(blog);
     
     const savedBlog = await blog.save()
     response.status(201).json(savedBlog)
