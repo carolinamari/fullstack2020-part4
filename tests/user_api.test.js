@@ -52,6 +52,106 @@ describe('When there is initially one user in db', () => {
         const usernames = usersAtEnd.map(u => u.username)
         expect(usernames).toContain(newUser.username)
     })
+
+    test('Creation fails if username is already taken', async () => {
+        const usersAtStart = await helper.usersInDB()
+
+        const newUser = {
+            username: 'root',
+            name: 'Ana Banana',
+            password: 'banana',
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await helper.usersInDB()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
+
+    test('Creation fails if username has less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDB()
+
+        const newUser = {
+            username: 'ab',
+            name: 'Ana Banana',
+            password: 'banana',
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await helper.usersInDB()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).not.toContain(newUser.username)
+    })
+
+    test('Creation fails if username is not given', async () => {
+        const usersAtStart = await helper.usersInDB()
+
+        const newUser = {
+            name: 'Ana Banana',
+            password: 'banana',
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await helper.usersInDB()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).not.toContain(newUser.username)
+    })
+
+    test('Creation fails if password is not given', async () => {
+        const usersAtStart = await helper.usersInDB()
+
+        const newUser = {
+            username: 'anabanana',
+            name: 'Ana Banana'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await helper.usersInDB()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).not.toContain(newUser.username)
+    })
+
+    test('Creation fails if password has less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDB()
+
+        const newUser = {
+            username: 'anabanana',
+            name: 'Ana Banana',
+            password: 'ab',
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        const usersAtEnd = await helper.usersInDB()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).not.toContain(newUser.username)
+    })
 })
 
 afterAll(() => {
