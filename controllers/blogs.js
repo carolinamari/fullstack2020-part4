@@ -35,8 +35,17 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)   
+    console.log(decodedToken);
+    
+    const blogToDelete = await Blog.findById(request.params.id)
+
+    if (decodedToken.id === blogToDelete.userId.toString()) {
+        await Blog.findByIdAndRemove(request.params.id)
+        return response.status(204).end()
+    }
+    
+    return response.status(401).json({ error: 'This user does not have authorization to perform the operation' })
 })
 
 blogsRouter.put('/:id', async (request, response) => {
