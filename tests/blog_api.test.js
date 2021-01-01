@@ -43,6 +43,12 @@ describe('GET requests to /api/blogs', () => {
 describe('POST requests to /api/blogs', () => {
 
     test('Add new blog to database', async () => {
+        const userCredential = {
+            username: "mluukkai",
+            password: "pass1"
+        }
+        const userLogin = await api.post('/api/login').send(userCredential)
+        
         const newBlog = {
             title: 'New blog',
             author: 'New author',
@@ -53,6 +59,7 @@ describe('POST requests to /api/blogs', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${userLogin.token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
         
@@ -61,9 +68,18 @@ describe('POST requests to /api/blogs', () => {
 
         expect(response.body).toHaveLength(helper.initBlogs.length + 1)
         expect(urls).toContain('www.newblog.com')
+
+        const i = _.findIndex(response.body, (blog) => blog.url === newBlog.url)
+        expect(response.body[i].userId.username).toBe(userCredential.username)
     })
 
     test('Add new blog with likes property missing', async () => {
+        const userCredential = {
+            username: "mluukkai",
+            password: "pass1"
+        }
+        const userLogin = await api.post('/api/login').send(userCredential)
+
         const newBlog = {
             title: 'New blog 2',
             author: 'New author 2',
@@ -73,6 +89,7 @@ describe('POST requests to /api/blogs', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${userLogin.token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
         
@@ -80,9 +97,16 @@ describe('POST requests to /api/blogs', () => {
         const i = _.findIndex(response.body, (blog) => blog.url === newBlog.url)
 
         expect(response.body[i].likes).toBe(0)
+        expect(response.body[i].userId.username).toBe(userCredential.username)
     })
 
     test('Blog without title and url is not added', async () => {
+        const userCredential = {
+            username: "mluukkai",
+            password: "pass1"
+        }
+        const userLogin = await api.post('/api/login').send(userCredential)
+
         const newBlog = {
             author: 'New author 3',
             likes: 50
@@ -91,7 +115,31 @@ describe('POST requests to /api/blogs', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${userLogin.token}`)
             .expect(400)
+
+        const response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initBlogs.length)
+    })
+
+    test('If a token is not provided, the blog is not added', async () => {
+        const userCredential = {
+            username: "mluukkai",
+            password: "pass1"
+        }
+        const userLogin = await api.post('/api/login').send(userCredential)
+
+        const newBlog = {
+            title: 'New blog',
+            author: 'New author',
+            url: 'www.newblog.com',
+            likes: 18
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
 
         const response = await api.get('/api/blogs')
         expect(response.body).toHaveLength(helper.initBlogs.length)
